@@ -7,7 +7,7 @@ public class TwinPrimeGenerator {
      * @return The larger twin prime in the pair, or -1 if none found.
      */
     public static int generateTwinPrime(int min, int max) {
-        for (int n = min; n <= max - 2; n++) {
+        for (int n = max - 2; n >= min; n--) { // Search backwards for the largest twin prime
             if (isPrime(n) && isPrime(n + 2)) {
                 return n + 2; // Return the larger of the twin primes
             }
@@ -21,9 +21,8 @@ public class TwinPrimeGenerator {
      * @return True if the number is prime, false otherwise.
      */
     private static boolean isPrime(int num) {
-        if (num < 2) return false;
-        if (num == 2 || num == 3) return true;
-        if (num % 2 == 0 || num % 3 == 0) return false;
+        if (num == 2 || num == 3) return true; // Handle small primes early
+        if (num < 2 || num % 2 == 0 || num % 3 == 0) return false; // Eliminate evens and multiples of 3
 
         // Check divisibility from 5 to sqrt(num) using 6k ± 1 optimization
         for (int i = 5; i * i <= num; i += 6) {
@@ -34,4 +33,3 @@ public class TwinPrimeGenerator {
         return true;
     }
 }
-

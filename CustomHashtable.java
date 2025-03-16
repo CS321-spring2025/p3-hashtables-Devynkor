@@ -1,6 +1,6 @@
 import java.lang.reflect.Array;
 
-public abstract class Hashtable<T> {
+public abstract class CustomHashtable<T> {
     protected int tableSize;               // Size of the hash table
     protected HashObject<T>[] table;       // Array to store hash objects
     protected int numElements;             // Number of elements inserted
@@ -10,7 +10,7 @@ public abstract class Hashtable<T> {
      * Constructor: Initializes hash table with given size.
      */
     @SuppressWarnings("unchecked")
-    public Hashtable(int size) {
+    public CustomHashtable(int size) {
         this.tableSize = size;
         this.table = (HashObject<T>[]) Array.newInstance(HashObject.class, size);
         this.numElements = 0;
@@ -71,7 +71,7 @@ public abstract class Hashtable<T> {
     /**
      * Abstract method to be implemented by subclasses for different probing strategies.
      */
-    protected abstract int getProbeIndex(T key, int probeCount);
+    protected abstract int getProbeIndex(T key, int currentIndex);
 
     /**
      * Returns the average number of probes per insertion.

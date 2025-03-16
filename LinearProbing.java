@@ -1,4 +1,4 @@
-public class LinearProbing<T> extends Hashtable<T> {
+public class LinearProbing<T> extends CustomHashtable<T> {
 
     /**
      * Constructor: Initializes a hash table with the given size using linear probing.

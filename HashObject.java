@@ -47,7 +47,7 @@ public class HashObject<T> {
      */
     public void setProbeCount(int probeCount) {
         this.probeCount = probeCount;
-    }
+    } 
 
     /**
      * Overrides equals() to compare HashObjects by key value.
@@ -55,10 +55,11 @@ public class HashObject<T> {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (!(obj instanceof HashObject<?>)) return false;
         HashObject<?> other = (HashObject<?>) obj;
         return key.equals(other.key);
     }
+
 
     /**
      * Overrides hashCode() to ensure consistent hashing behavior.
