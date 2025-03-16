@@ -27,7 +27,21 @@ public class HashtableExperiment {
 
         System.out.println("HashtableExperiment: Input: " + getDataSourceName(dataSource) + "   Loadfactor: " + loadFactor);
 
-        insertData(linearTable, doubleTable, dataSource, numElements, debugLevel);
+        Scanner scanner = null;
+        if (dataSource == 3) {
+            try {
+                scanner = new Scanner(new File("word-list.txt"));
+            } catch (FileNotFoundException e) {
+                System.err.println("Error: Word list file not found.");
+            }
+        }
+
+        insertData(linearTable, doubleTable, dataSource, numElements, debugLevel, scanner);
+
+        // Close scanner after use
+        if (scanner != null) {
+            scanner.close();
+        }
 
         // Output summary results
         printResults("Using Linear Probing", linearTable);
@@ -44,24 +58,20 @@ public class HashtableExperiment {
     /**
      * Inserts data into both hash tables based on the selected data source.
      */
-    private static void insertData(LinearProbing<Object> linearTable, DoubleHashing<Object> doubleTable, int dataSource, int numElements, int debugLevel) {
+    private static void insertData(LinearProbing<Object> linearTable, DoubleHashing<Object> doubleTable, int dataSource, int numElements, int debugLevel, Scanner scanner) {
         Random random = new Random();
         long currentTime = new Date().getTime();
 
-        try (Scanner scanner = (dataSource == 3) ? new Scanner(new File("word-list.txt")) : null) {
-            for (int i = 0; i < numElements; i++) {
-                Object key = generateKey(dataSource, random, currentTime, scanner, i);
+        for (int i = 0; i < numElements; i++) {
+            Object key = generateKey(dataSource, random, currentTime, scanner, i);
 
-                boolean insertedLinear = linearTable.insert(key);
-                boolean insertedDouble = doubleTable.insert(key);
+            boolean insertedLinear = linearTable.insert(key);
+            boolean insertedDouble = doubleTable.insert(key);
 
-                if (debugLevel == 2) {
-                    System.out.printf("Insert %d: Key=%s | Linear: %s | Double: %s\n",
-                            i + 1, key, insertedLinear ? "Inserted" : "Duplicate", insertedDouble ? "Inserted" : "Duplicate");
-                }
+            if (debugLevel == 2) {
+                System.out.printf("Insert %d: Key=%s | Linear: %s | Double: %s\n",
+                        i + 1, key, insertedLinear ? "Inserted" : "Duplicate", insertedDouble ? "Inserted" : "Duplicate");
             }
-        } catch (FileNotFoundException e) {
-            System.err.println("Error: Word list file not found.");
         }
     }
 
@@ -70,10 +80,14 @@ public class HashtableExperiment {
      */
     private static Object generateKey(int dataSource, Random random, long currentTime, Scanner scanner, int index) {
         switch (dataSource) {
-            case 1: return random.nextInt();
-            case 2: return new Date(currentTime + (index * 1000)); // Increasing time values by 1 second
-            case 3: return (scanner != null && scanner.hasNext()) ? scanner.nextLine() : "Word" + index;
-            default: throw new IllegalArgumentException("Invalid data source: " + dataSource);
+            case 1:
+                return random.nextInt();
+            case 2:
+                return new Date(currentTime + (index * 1000)); // Increasing time values by 1 second
+            case 3:
+                return (scanner != null && scanner.hasNext()) ? scanner.nextLine() : "Word" + index;
+            default:
+                throw new IllegalArgumentException("Invalid data source: " + dataSource);
         }
     }
 
@@ -91,11 +105,15 @@ public class HashtableExperiment {
      * Returns a string representation of the data source.
      */
     private static String getDataSourceName(int dataSource) {
-        return switch (dataSource) {
-            case 1 -> "Random Numbers";
-            case 2 -> "Date Values";
-            case 3 -> "Word List";
-            default -> "Unknown";
-        };
+        switch (dataSource) {
+            case 1:
+                return "Random Numbers";
+            case 2:
+                return "Date Values";
+            case 3:
+                return "Word List";
+            default:
+                return "Unknown";
+        }
     }
 }
