@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Date;
 
-public class HashtableExperiment {
+public class HashTableExperiment {
     
     public static void main(String[] args) {
         if (args.length < 2 || args.length > 3) {
