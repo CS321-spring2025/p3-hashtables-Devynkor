@@ -7,7 +7,7 @@ public abstract class CustomHashtable<T> {
     protected HashObject<T>[] table;
     protected int numElements;
     protected int totalProbes;
-    private int duplicateCount;  // ✅ New field for duplicate tracking
+    private int duplicateCount;  // Track duplicate insertions
 
     /**
      * Constructor: Initializes hash table with given size.
@@ -18,11 +18,13 @@ public abstract class CustomHashtable<T> {
         this.table = (HashObject<T>[]) Array.newInstance(HashObject.class, size);
         this.numElements = 0;
         this.totalProbes = 0;
-        this.duplicateCount = 0; // ✅ Initialize duplicates count
+        this.duplicateCount = 0; // Initialize duplicate count
     }
 
     /**
      * Inserts a key into the hash table using open addressing.
+     * If a duplicate is detected, increments its frequency and counts as a duplicate.
+     * Otherwise, inserts a new HashObject, counting the effective probe as probeCount+1.
      */
     public boolean insert(T key) {
         if (numElements >= tableSize) return false; // Table is full
@@ -33,7 +35,7 @@ public abstract class CustomHashtable<T> {
         while (table[currentIndex] != null) {
             if (table[currentIndex].getKey().equals(key)) {
                 table[currentIndex].incrementFrequency(); // Duplicate detected
-                duplicateCount++; // ✅ Track duplicates
+                duplicateCount++; // Track duplicates
                 return false;
             }
             probeCount++;
@@ -41,11 +43,12 @@ public abstract class CustomHashtable<T> {
             if (probeCount >= tableSize) return false; // Prevent infinite loop
         }
 
-        // Insert new HashObject
+        // Count at least one probe for a successful insertion.
+        int effectiveProbe = probeCount + 1;
         table[currentIndex] = new HashObject<>(key);
-        table[currentIndex].setProbeCount(probeCount);
+        table[currentIndex].setProbeCount(effectiveProbe);
         numElements++;
-        totalProbes += probeCount;
+        totalProbes += effectiveProbe;
         return true;
     }
 
@@ -57,7 +60,7 @@ public abstract class CustomHashtable<T> {
     }
 
     /**
-     * Setter for duplicate count (for tracking in experiments).
+     * Setter for duplicate count.
      */
     public void setDuplicateCount(int count) {
         this.duplicateCount = count;
@@ -102,13 +105,20 @@ public abstract class CustomHashtable<T> {
     }
 
     /**
-     * Dumps the hash table contents.
+     * Dumps the hash table contents to a file.
+     * Each line is formatted as:
+     * "table[index]:  key frequency probeCount"
+     * (with exactly two spaces after the colon and one space between fields).
      */
     public void dumpToFile(String fileName) {
         try (PrintWriter out = new PrintWriter(fileName)) {
             for (int i = 0; i < tableSize; i++) {
                 if (table[i] != null) {
-                    out.printf("table[%d]: %s%n", i, table[i]); // Ensures no extra spaces
+                    out.printf("table[%d]:  %s %d %d%n", 
+                               i, 
+                               table[i].getKey(), 
+                               table[i].getFrequency(), 
+                               table[i].getProbeCount());
                 }
             }
         } catch (IOException e) {
