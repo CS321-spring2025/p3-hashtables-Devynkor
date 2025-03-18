@@ -8,7 +8,7 @@ public class HashTableExperiment {
     
     public static void main(String[] args) {
         if (args.length < 2 || args.length > 3) {
-            System.out.println("Usage: java HashtableExperiment <dataSource> <loadFactor> [<debugLevel>]");
+            System.out.println("Usage: java HashTableExperiment <dataSource> <loadFactor> [<debugLevel>]");
             return;
         }
 
@@ -44,7 +44,7 @@ public class HashTableExperiment {
         Random random = new Random();
         long currentTime = new Date().getTime();
 
-        while (linearTable.numElements < targetUnique) {
+        while (linearTable.getNumElements() < targetUnique) {
             Object key = generateKey(dataSource, random, currentTime, scanner, totalAttempts);
 
             boolean insertedLinear = linearTable.insert(key);
@@ -99,12 +99,11 @@ public class HashTableExperiment {
         System.out.println("\n" + title);
         int printedSize = (int) Math.ceil(table.tableSize / 2.0);
         System.out.println("HashtableExperiment: size of hash table is " + printedSize);
-        int unique = table.numElements;
+        int unique = table.getNumElements();
         int duplicates = totalAttempts - unique;
         System.out.println("Inserted " + totalAttempts + " elements, of which " + duplicates + " were duplicates");
-        // Each unique insertion is counted as at least one probe; so add 1 to each probe count.
-        // We adjust the average by adding 1 per unique insertion.
-        double adjustedAverage = ((double) table.totalProbes + unique) / unique;
+        // Adjust average probes by assuming each unique insertion has at least 1 probe.
+        double adjustedAverage = ((double) table.getTotalProbes() + unique) / unique;
         System.out.printf("Avg. no. of probes = %.2f%n", adjustedAverage);
     }
 
