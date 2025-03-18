@@ -23,8 +23,6 @@ public abstract class CustomHashtable<T> {
 
     /**
      * Inserts a key into the hash table using open addressing.
-     * If a duplicate is detected, increments its frequency and counts as a duplicate.
-     * Otherwise, inserts a new HashObject, counting the effective probe as probeCount+1.
      */
     public boolean insert(T key) {
         if (numElements >= tableSize) return false; // Table is full
@@ -124,5 +122,19 @@ public abstract class CustomHashtable<T> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+        
+    /**
+     * Public getter for the number of unique elements inserted.
+     */
+    public int getNumElements() {
+        return numElements;
+    }
+    
+    /**
+     * Public getter for the total number of probes used.
+     */
+    public int getTotalProbes() {
+        return totalProbes;
     }
 }
