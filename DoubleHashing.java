@@ -18,10 +18,10 @@ public class DoubleHashing<T> extends CustomHashtable<T> {
         int h1 = positiveMod(key.hashCode(), tableSize);
         int h2 = 1 + positiveMod(key.hashCode(), tableSize - 2);
 
-        // Fix: Ensure h2 is never 0 to avoid infinite loops
+        // Ensure h2 is never 0
         if (h2 == 0) h2 = 1;
 
-        // Fix: Ensure h2 is odd to reduce common factors with tableSize
+        // Ensure h2 is odd to reduce common factors with tableSize
         if (h2 % 2 == 0) h2++;
 
         return (h1 + probeCount * h2) % tableSize; // Double hashing logic

@@ -75,5 +75,5 @@ public class HashObject<T> {
     @Override
     public String toString() {
         return key + " " + frequency + " " + probeCount;
-    }    
+    }
 }

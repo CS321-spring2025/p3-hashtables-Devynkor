@@ -1,10 +1,13 @@
 import java.lang.reflect.Array;
+import java.io.PrintWriter;
+import java.io.IOException;
 
 public abstract class CustomHashtable<T> {
-    protected int tableSize;               // Size of the hash table
-    protected HashObject<T>[] table;       // Array to store hash objects
-    protected int numElements;             // Number of elements inserted
-    protected int totalProbes;             // Total probes across all insertions
+    protected int tableSize;
+    protected HashObject<T>[] table;
+    protected int numElements;
+    protected int totalProbes;
+    private int duplicateCount;  // ✅ New field for duplicate tracking
 
     /**
      * Constructor: Initializes hash table with given size.
@@ -15,6 +18,7 @@ public abstract class CustomHashtable<T> {
         this.table = (HashObject<T>[]) Array.newInstance(HashObject.class, size);
         this.numElements = 0;
         this.totalProbes = 0;
+        this.duplicateCount = 0; // ✅ Initialize duplicates count
     }
 
     /**
@@ -24,23 +28,39 @@ public abstract class CustomHashtable<T> {
         if (numElements >= tableSize) return false; // Table is full
 
         int probeCount = 0;
-        int index = getProbeIndex(key, probeCount); // Subclass defines probing logic
+        int currentIndex = getProbeIndex(key, probeCount); // Subclass defines probing logic
 
-        while (table[index] != null) {
-            if (table[index].getKey().equals(key)) {
-                table[index].incrementFrequency(); // Duplicate detected
+        while (table[currentIndex] != null) {
+            if (table[currentIndex].getKey().equals(key)) {
+                table[currentIndex].incrementFrequency(); // Duplicate detected
+                duplicateCount++; // ✅ Track duplicates
                 return false;
             }
             probeCount++;
-            index = getProbeIndex(key, probeCount); // Get next probe index
+            currentIndex = getProbeIndex(key, probeCount);
+            if (probeCount >= tableSize) return false; // Prevent infinite loop
         }
 
         // Insert new HashObject
-        table[index] = new HashObject<>(key);
-        table[index].setProbeCount(probeCount);
+        table[currentIndex] = new HashObject<>(key);
+        table[currentIndex].setProbeCount(probeCount);
         numElements++;
         totalProbes += probeCount;
         return true;
+    }
+
+    /**
+     * Getter for duplicate count.
+     */
+    public int getDuplicateCount() {
+        return duplicateCount;
+    }
+
+    /**
+     * Setter for duplicate count (for tracking in experiments).
+     */
+    public void setDuplicateCount(int count) {
+        this.duplicateCount = count;
     }
 
     /**
@@ -48,14 +68,15 @@ public abstract class CustomHashtable<T> {
      */
     public boolean search(T key) {
         int probeCount = 0;
-        int index = getProbeIndex(key, probeCount);
+        int currentIndex = getProbeIndex(key, probeCount);
 
-        while (table[index] != null) {
-            if (table[index].getKey().equals(key)) {
+        while (table[currentIndex] != null) {
+            if (table[currentIndex].getKey().equals(key)) {
                 return true;
             }
             probeCount++;
-            index = getProbeIndex(key, probeCount);
+            currentIndex = getProbeIndex(key, probeCount);
+            if (probeCount >= tableSize) return false;
         }
         return false;
     }
@@ -71,7 +92,7 @@ public abstract class CustomHashtable<T> {
     /**
      * Abstract method to be implemented by subclasses for different probing strategies.
      */
-    protected abstract int getProbeIndex(T key, int currentIndex);
+    protected abstract int getProbeIndex(T key, int probeCount);
 
     /**
      * Returns the average number of probes per insertion.
@@ -84,13 +105,13 @@ public abstract class CustomHashtable<T> {
      * Dumps the hash table contents.
      */
     public void dumpToFile(String fileName) {
-        try (java.io.PrintWriter out = new java.io.PrintWriter(fileName)) {
+        try (PrintWriter out = new PrintWriter(fileName)) {
             for (int i = 0; i < tableSize; i++) {
                 if (table[i] != null) {
-                    out.println("table[" + i + "]: " + table[i]);
+                    out.printf("table[%d]: %s%n", i, table[i]); // Ensures no extra spaces
                 }
             }
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

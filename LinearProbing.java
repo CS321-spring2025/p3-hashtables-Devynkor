@@ -15,6 +15,6 @@ public class LinearProbing<T> extends CustomHashtable<T> {
     @Override
     protected int getProbeIndex(T key, int probeCount) {
         int hash = positiveMod(key.hashCode(), tableSize);
-        return (hash + probeCount) % tableSize; // Linear probing logic
+        return positiveMod(hash + probeCount, tableSize);
     }
 }
