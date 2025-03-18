@@ -4,11 +4,11 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Date;
 
-public class HashTableExperiment {
+public class HashtableExperiment {
     
     public static void main(String[] args) {
         if (args.length < 2 || args.length > 3) {
-            System.out.println("Usage: java HashTableExperiment <dataSource> <loadFactor> [<debugLevel>]");
+            System.out.println("Usage: java HashtableExperiment <dataSource> <loadFactor> [<debugLevel>]");
             return;
         }
 
